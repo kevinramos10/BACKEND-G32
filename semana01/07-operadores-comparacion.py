@@ -21,4 +21,4 @@ print(a>=b)
 #Menor o igual que
 print(a<=b)
 
-#Nota: estos operadores imprime si es False o True
+#Nota: estos operadores comparativos imprime si es False o True solo para numero

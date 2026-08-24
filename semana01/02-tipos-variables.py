@@ -12,5 +12,28 @@ texto = '''Hola soy su profesor.
 
 apellido = "Ramos"
 
-#
+#El prefijo f antes del string para poder escribir codigo python
+saludo = f'Hola mucho gusto {apellido}'
+print(saludo)
+
+#Para el uso del format tambien sirve para codigo python
+saludo2 = 'Hola {}, mucho gusto'.format(apellido)
+print(saludo2)
+
+
+#ENTEROS
+edad = 30
+
+#DECIMALES O FLOAT
+estatura = 1.88
+
+#BOOLEAN
+aprobado = True
+viudo = False
+
+#Las variables nunca pueden empezar con: numeros, caracteres especiales
+#No se recomiendas empezar con _ ya que eso usa en encapsulamiento
+
+#SABER TIPO DE VARIABLE
+print(type(estatura)) #Nos imprimi el tipo de la variable del caracter
 

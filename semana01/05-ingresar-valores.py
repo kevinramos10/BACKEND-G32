@@ -9,3 +9,5 @@ edad = '34'
 #convertimos a entero
 edad_numerica = int(edad)
 
+#Nota: Solo se puede converir string de numero osea '50' o '600' etc
+

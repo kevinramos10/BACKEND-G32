@@ -1,7 +1,7 @@
 # Coleccion de datos Editable pero no es ordenada
 # Se suelen utilizar para almacenar inforamcion y luego corroboara su contenido sin importar algun orden en especifico
 roles = {"USUARIO", "ADMIN", "INVITADO", "ALUMNO", "PROFESOR"}
-print(roles)
+print(roles) #No es ordenada imprime al azar 
 
 # Para poder agreagar nuevos datos
 roles.add("SUPERADMIN")

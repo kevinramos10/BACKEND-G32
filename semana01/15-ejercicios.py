@@ -4,11 +4,13 @@ total = 0
 for x in numeros:
     total += x
 print(f"Suma total: {total}")
+print('-----')
 
 # 2. Dado la lista de nombres = ["Joshua", "Judith", "Eduardo","Jean Pierre", "Luis"] quiero convertir todos los nombres a mayuscula (.upper())
 nombres = ["Joshua", "Judith", "Eduardo","Jean Pierre", "Luis"]
 for n in nombres:
     print(n.upper())
+print('-----')
 
 # 3. Dado la lista de precios = [10.5, 14.8, 17.2, 19.45] Calcular el promedio y la cantidad de elementos de la lista
 precios = [10.5, 14.8, 17.2, 19.45]
@@ -17,9 +19,18 @@ promedio = 0
 for p in precios:
     promedio += p
 promedio = promedio/cant
-print(promedio)
+print(f'El promedio es: {promedio}')
+print('-----')
 
-# 4. Tengo la siguiente lista de tuplas estudiantes = [("Juana", 26), ("David", 30), ("Ronaldo",18), ("Fatima", 23)] usando un for desempaquete la tupla e imprime usando el formato "NOMBRE tiene EDAD años"
+# 4. Tengo la siguiente lista de tuplas 
+# estudiantes = [("Juana", 26), ("David", 30), ("Ronaldo",18), ("Fatima", 23)] 
+# usando un for desempaquete la tupla e imprime usando el formato "NOMBRE tiene EDAD años"
+
+estudiantes = [("Juana", 26), ("David", 30), ("Ronaldo",18), ("Fatima", 23)]
+for e in estudiantes:
+    nombre, edad = e
+    print(f'{nombre} tiene {edad} años')
+print('-----')
 
 # 5. Tengo el diccionario
 # producto = {
@@ -34,7 +45,46 @@ print(promedio)
 #         "caja":False
 #     }
 # } 
-# Necesito saber cuantos pros tengo y cuantos contras tengo, asi mismo quiero saber que paise_procedencia es y cual es el ultimo contras
+# Necesito saber cuantos pros tengo y cuantos contras tengo, asi mismo quiero saber que paise_procedencia
+# es y cual es el ultimo contras
 
-# 6. Tengo una lista de tuplas ventas = [("enero", 1500), ("febrero", 2300), ("marzo",1800)] recorrela en un for y construye un diccionario ventas_dic donde la clave sea el mes y el valor sea el monto. Es decir, el resultado final debe ser 
+producto = {
+    "nombre":"Tarjeta Grafica",
+    "precio":3020.52,
+    "especificaciones":"Tarjeta grafica de ultima generacion",
+    "pros":["Economica","Moderna","Sencilla instalacion"],
+    "contras": ["No hay garantia", "Se sobrecalienta","No tiene drivers"],
+    "info_adicional":{
+        "pais_procedencia":"China",
+        "estado":"Nuevo",
+        "caja":False
+    }
+}
+
+pros = len(producto["pros"])
+contra = len(producto["contras"])
+print(f"Tengo {pros} pros y {contra} contras")
+
+pais_procedencia = producto['info_adicional']["pais_procedencia"]
+print(f'Pais procedencia: {pais_procedencia}')
+
+ultimo_contras = producto["contras"][-1]
+print(f'Ultimo contras: {ultimo_contras}')
+
+print('-----')
+# 6. Tengo una lista de tuplas ventas = [("enero", 1500), ("febrero", 2300), ("marzo",1800)] 
+# recorrela en un for y construye un diccionario ventas_dic donde la clave sea el mes y el valor sea el monto. 
+# Es decir, el resultado final debe ser 
 # ventas_dic = {"enero":1500, "febrero":2300, "marzo":1800}
+
+ventas = [("enero", 1500), ("febrero", 2300), ("marzo",1800)] 
+ventas_dic = {}
+
+for v in ventas:
+    mes, monto = v
+    ventas_dic[mes] = monto
+
+print(ventas_dic)
+
+
+

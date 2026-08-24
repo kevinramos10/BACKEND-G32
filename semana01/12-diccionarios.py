@@ -35,7 +35,7 @@ print(alumno.values())
 
 # Para hacer asignaciones SI O SI usamos los corchetes y no el metodo GET, ese solo es para obtener info
 alumno['nacionalidad'] = 'Boliviano'
-# alumno.get('nacionalidad') = 'Boliviano'
+# alumno.get('nacionalidad') = 'Boliviano' esto lanza error no se puede
 
 alumnos = ({'nombre':'juancito'},{'nombre':'martita'}, {'nombre':'robertito'})
 

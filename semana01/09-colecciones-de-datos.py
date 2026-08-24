@@ -1,4 +1,4 @@
-# Listas (Arreglos)
+# LISTAS (Arreglos)
 #Coleccion de datos ordenada y editable
 
 frutas = ['manzana', 'pera', 'kiwi', 'platano', 1, True, 10.5]
@@ -18,7 +18,6 @@ print(frutas[:3])
 #Si no se le pone posicion al final agarra desde la inicio hasta el final
 print(frutas[3:])
 
-
 # agregamos nuevos elementos al final de la lista
 frutas.append('sandia')
 
@@ -27,7 +26,7 @@ frutas.insert(1, 'mango')
 print(frutas)
 
 #remove elimina el valor si lo encuentra y si no hay lanza error
-frutas.remove(1)
+frutas.remove('manzana')
 
 #pop elimina el contenido por si indice y devuelve el valor eliminado
 eliminado = frutas.pop(5)
@@ -47,3 +46,4 @@ print(longitud)
 
 #Clear limpia toda la lista y la deja vacia
 frutas.clear()
+print(frutas)
