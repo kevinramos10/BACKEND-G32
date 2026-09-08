@@ -85,6 +85,3 @@ for v in ventas:
     ventas_dic[mes] = monto
 
 print(ventas_dic)
-
-
-

@@ -20,5 +20,5 @@ numero = (1)
 print(type(numero))
 
 #Para crear elementos de tupla de un solo elemento se le coloca una coma al ginal
-numero =(1,)
+numero = (1,)
 print(type(numero))

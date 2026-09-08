@@ -54,4 +54,45 @@ SELECT * FROM personas;
 
 SELECT * FROM personas WHERE id > 2;
 
-SELECT * FROM personas WHERE id > 2 AND nombre = 'Rodigo' OR nombre = 'Marge';
+SELECT * FROM personas WHERE id > 2 AND nombre = 'Rodrigo' OR nombre = 'Marge';
+
+--Los filtros de busqueda son sencibles a mayusculas y minisculas
+SELECT * FROM personas WHERE id > 2 AND nombre = 'rodrigo' OR nombre = 'marge';
+
+
+-- Los alias sirven para evitar poner el nombre completo de la tabla o relacion
+SELECT p.id FROM personas AS p;
+--El AS es opcional
+SELECT p.id FROM personas p;
+
+-- En el WHERE se le puede colocar
+-- = solo un = no existe 2
+-- < menor que
+-- <= menos igual que
+-- > mayor que
+-- >= mayor igual que
+-- != diferente que
+
+--Si se dedea hacer una busqueda en una columna numero por limites osea desde hasta se usa:
+---BETWEEN AND
+SELECT * FROM personas WHERE id BETWEEN 2 AND 4;
+--Es lo mismo
+SELECT * FROM personas WHERE id >= 2 AND id <= 4;
+
+--Si se quiere hacer la busqueda por unos determinandos valores, entonces se pone la palabra:
+--IN
+--Esto se podria interpretar como un OR pero no es lo mismo
+SELECT * FROM personas WHERE nombre IN ('Eduardo', 'Rodrigo');
+
+-- Si deseo hacer una busqueda pero no me se el valor exacto utilizamos el:
+-- LIKE
+--Este interpreta lo que viene luego es sensible a mayusculas y minusculas
+SELECT * FROM personas WHERE nombre LIKE 'Rodri%';
+-- Para que no importe las mayusculas y minusculas se pone con:
+-- ILIKE
+SELECT * FROM personas WHERE nombre ILIKE '%rodri%';
+
+--Si queremos obtener los resultados que tengan valores nulos:
+SELECT * FROM personas WHERE peso IS NULL; -- Todos con peso vacio
+SELECT * FROM personas WHERE peso IS NOT NULL; -- Todos que no sean peso vacio
+ 
