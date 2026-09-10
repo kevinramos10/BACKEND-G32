@@ -95,4 +95,6 @@ SELECT * FROM personas WHERE nombre ILIKE '%rodri%';
 --Si queremos obtener los resultados que tengan valores nulos:
 SELECT * FROM personas WHERE peso IS NULL; -- Todos con peso vacio
 SELECT * FROM personas WHERE peso IS NOT NULL; -- Todos que no sean peso vacio
+
+
  
