@@ -1,0 +1,12 @@
+#es un archivo que indca a git que archivos debe ignorar
+
+.env
+
+# Todos los arhivos que termine en .pdf
+#*.pfd
+
+#ayuda.*
+
+# Se puede ignorar carpetas completas 
+#mi_carpeta/
+#2.18

@@ -2,10 +2,20 @@
 #request nos dara toda la informacion proveniente del cliente, y solo puede ser llamador dentro de un controlador
 from flask import Flask, request
 from werkzeug.exceptions import UnsupportedMediaType
+
+from os import environ #devolvera todas las variables de entorno de la maquina y aqui se agregaran las variables del archivo .env
+
+
+from dotenv import load_dotenv
+#El load_dotenv siempre va en la 1era linea del proyecto para que cargue las variables en todo el proyecto y evitar alguna variable no leida
+
+load_dotenv()
+
 from psycopg import connect
 
 # postgresql://NOMBRE_USUARIO:PASSWORD_USUARIO@HOST:PUERTO/NOMBRE_BD
-credenciales = "postgresql://postgres:123456 @127.0.0.1:5432/flask_db"
+#credenciales = "postgresql://postgres:123456 @127.0.0.1:5432/flask_db"
+credenciales = environ.get("DATABASE_URL")
 conexion = connect(conninfo=credenciales)
 
 # __name__ > Variable global de python que sirve para indicar si el archivo en el cual nos encontramos se esta ejecutando directamente o no en la terminal 
@@ -48,12 +58,12 @@ def gestionar_productos():
 
         # Para obtener el resultado (si es necesario) usamos los metodos fetchone, fetchall, fetchmany
         productos_bd = cursor.fetchall()
-
         print(productos_bd)
+        cursor.close() #Cerramos la conexion de la BD, Finaliza la comunicacion
 
         resultado = []
         for producto in productos_bd:
-            resultado.append({
+            resultado.append({ 
                 "id": producto[0],
                 "nombre": producto[1],
                 "precio": float(producto[2]),
@@ -77,8 +87,28 @@ def gestionar_productos():
         #Le colocamos un try ya que como no hay danos no esta trayendo nada y nos mandara error
         try:
             data = request.get_json()
+
+            cursor = conexion.cursor() #Abrimos la conexion con la BD
+
+            # %s hace la conversion de la inforamcion proveniente del cliente a un string sin parametros que puedan vulnerar mi BD y en los string comunes podemos utilizar %f para los flotantes y adicionalmente el %i para convertir a enteros y asi podemos evitar ataques directos a la BD a esto se le llama(SQL INYECTION)
+            # Si queremos retornar la informacion que acabamos de grabar en la base de datos se puede utilizar el comando RETURNING columnas, es decir, si ponemos INSERT INTO ... VALUES ... RETURNING * esto devolvera toda la informacion agregada a la bd
+            cursor.execute("INSERT INTO productos (nombre, precio, cantidad) VALUES (%s, %s, %s) RETURNING *", (
+                data.get("nombre"),
+                data.get("precio"),
+                data.get("cantidad")))
+
+            #Para concervar la data y asegurarnos que la nueva informacion si se guarde en la BD usamos el conexion.commit()
+            conexion.commit()
+
+            #Para obtener el nuevo producto creado y poder imprimirlo
+            nuevo_producto = cursor.fetchone()
+            print(nuevo_producto)
+
+            #Cerramos la conexion
+            cursor.close()
+
             #Ahora con la informacion correcta agregamos este producto a nuestra lista
-            productos.append(data)
+            #productos.append(data)
             return {
                 "message": "Producto creado exitosamente"
             }
