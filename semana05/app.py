@@ -12,6 +12,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from psycopg import connect
+from psycopg.rows import dict_row
 
 # postgresql://NOMBRE_USUARIO:PASSWORD_USUARIO@HOST:PUERTO/NOMBRE_BD
 #credenciales = "postgresql://postgres:123456 @127.0.0.1:5432/flask_db"
@@ -66,7 +67,8 @@ def gestionar_productos():
             resultado.append({ 
                 "id": producto[0],
                 "nombre": producto[1],
-                "precio": float(producto[2]),
+                #Validar si el producto[2] no esta vacio convierte a float, sino devolver el valor actual
+                "precio": float(producto[2]) if producto[2] else producto[2],
                 "cantidad": producto[3]
             })
 
@@ -111,19 +113,83 @@ def gestionar_productos():
             #productos.append(data)
             return {
                 "message": "Producto creado exitosamente"
-            }
+            },201 #CREATED (Creado)
         except UnsupportedMediaType:
         #except Exception as error:
             #Exceiption es la clase primordial de los errores para poder saber que error es alias es as
             #print(type(error)) #para saber el error cual es
             return {
                 "message": "Se debe enviar la informacion en formato json"
+            },400 # Bad Request (Mala solicitud)
+
+# En el endpoint cuando se coloca variable significa que esa parte recivira un valor diferente y ese valor se almacenara en la variable con ese nombre
+@app.route('/producto/<id>', methods = ['GET', 'PUT', 'DELETE'])
+def gestior_producto_por_id(id):
+
+    if request.method == 'GET':
+
+        cursor = conexion.cursor(row_factory=dict_row)
+
+        cursor.execute("SELECT * FROM productos where id = %s", (id,))
+
+        resultado = cursor.fetchone()
+
+        print(resultado)
+
+        cursor.close()
+        if not resultado:
+            return{
+                "message":"Producto no encontrado"
+            },404 #NOT Found - No encontrado
+
+        return{
+            "content": {
+                "id": resultado.get("id"),
+                "nombre": resultado.get("nombre"),
+                "precio": float(resultado.get("precio")) if resultado.get("precio") else None,
+                "cantidad": resultado.get("cantidad")
             }
+        }
 
-        
+    elif request.method == 'PUT':
+        #Cuando tenemos un error en nuestra operación y hacemos un commit, se queda pegado y no permite realizar otra operación, ya que está bloqueado. Entonces, para liberar esa operación y dejarla sin efecto, usamos el rollback para deshacer todos los cambios. Si no hay ningún error, este comando no tendrá efecto, pero tampoco lanzará un error.
+        conexion.rollback()
+
+        cursor = conexion.cursor(row_factory=dict_row) # row_factory=dict_row PARA QUE EL RESULTADO SEA DICCIONARIO Y NO TUPLA
+        cursor.execute("SELECT id FROM productos WHERE id = %s", (id,))
+
+        productos_existente = cursor.fetchone()
+
+        if not productos_existente:
+            return{
+                "message": "Producto a actualizar no existe"
+            },404
+
+        #Ahora obtenemos la data proveniente del body
+        data = request.get_json()
+
+        cursor.execute("UPDATE productos SET nombre = %s, precio = %s, cantidad = %s WHERE id = %s RETURNING *" , (
+            data.get("nombre"),
+            data.get("precio"),
+            data.get("cantidad"),
+            id
+        ))
+
+        #Guardamos los cambios en la base de datos de manera permanente
+        conexion.commit()
+
+        #obtennemos la info actualizada
+        productos_existente = cursor.fetchone()
+
+        cursor.close()
+
+        return{
+            "message": "Producto actualizado exitosamente",
+            "content": productos_existente
+        }
 
 
-
+# ESTO SIEMPRE VA AL FINAL!!!!
 if __name__ == "__main__":
     # el metodo run ejecuta el servidor y lo mantiene escuchando peticiones
     # debug=True para que al guardar el archivo ctrl + c se cargue el servidor solito y siga corriendo
