@@ -4,3 +4,5 @@ flas db migrate -m > Visualiza todos los cambios de los modelos
 (tablas) con la base de datos y creara las migraciones 
 correspondientes con los cambios realizados en los modelos,
 si no  hay cambios no creara nada
+
+flask db upgrade > Crea las tabl as en la bd ejecuta las migraciones
