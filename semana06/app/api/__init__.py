@@ -1,1 +1,1 @@
-from .Categorias import CategoriaController
+from .Categorias import CategoriasController, CategoriaController
