@@ -3,7 +3,7 @@ from .config import config_map
 from .models import *
 from .extensions import db, migrate
 from flask_restful import Api
-from .api import CategoriasController, CategoriaController
+from .api import CategoriasController, CategoriaController, LibrosController, LibroController, LibrosCategoriasController
 
 #Al usar el patron de dise;o application factory se recomienda crear una funcion llamda create_app en la cual se inicializara todo el proyecto y asi mismo puede recibir parametros para los diferentes entornos de prueba
 def create_app(env = "development"):
@@ -25,6 +25,12 @@ def create_app(env = "development"):
     api.add_resource(CategoriasController, "/categorias")
      # al momento de refistrar una ruta y esta tiene simbolos <> esto es decir esta ruta es dinamica quiere decir que le colocara un valor a esa variable, esta debe ser el mismo nombre y asi mismo se puede restringir el tipo de dato
     api.add_resource(CategoriaController, '/categoria/<int:id>')
+
+    api.add_resource(LibrosController, "/libros")
+    api.add_resource(LibroController, '/libro/<int:id>')
+
+
+    api.add_resource(LibrosCategoriasController, "/libro-categorias")
 
     return app
 

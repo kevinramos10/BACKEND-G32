@@ -76,9 +76,21 @@ class CategoriaController(Resource):
 
         respuesta = CategoriaSchema.model_validate(categoriaEncontrada).model_dump()
 
+        print(categoriaEncontrada.libro_categorias)
+
+        cantidad = len(categoriaEncontrada.libro_categorias)
+
+        #Es igual
+        # cant = 0
+        # for libroCategoria in categoriaEncontrada.libro_categorias:
+        #     cant = cant + 1
+
+        respuesta["libros"] = cantidad
+
         return{
             'content': respuesta
         }
+
 
     def put(self, id):
         categoriaEncontrada = self.validarCategoria(id)
