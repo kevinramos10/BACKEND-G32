@@ -6,18 +6,33 @@ from app.models import Libro
 from app.extensions import db
 from datetime import datetime
 
+from app.util import paginationInfo
 class LibrosController(Resource):
 
     def get(self):
-        libros = db.session.query(Libro).filter(Libro.eliminado == False).all()
 
+        #Para saber que esta mandando el bruno
+        pagina = int(request.args.get('page', 1)) 
+        porPagina = int(request.args.get('perPage', 10))
+
+        #en un controlador con pagina necesitamos saber cuantos elementos tenemos por devolver
+        #Solo se necesita saber la cantidad de elemento que hay
+
+        total = db.session.query(Libro).filter(Libro.eliminado == False).count()    
+
+        offset = (pagina - 1) * porPagina
+        limit = porPagina
+        
+        libros = db.session.query(Libro).filter(Libro.eliminado == False).offset(offset).limit(limit).all()
         adaptador_libro = TypeAdapter(list[LibroSchema])
-
         resultado = adaptador_libro.validate_python(libros)
+
+        pageInfo = paginationInfo(total, pagina, porPagina)
 
         return{
             "message": "Los libros son:",
-            "content": adaptador_libro.dump_python(resultado, mode='json')
+            "content": adaptador_libro.dump_python(resultado, mode='json'),
+            'pageInfo': pageInfo
         }
 
     def post(self):
