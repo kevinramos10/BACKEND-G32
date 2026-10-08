@@ -11,6 +11,12 @@ class Nota(db.Model):
     nombre = Column(type_=types.Text, nullable=False)
     eliminado = Column(type_=types.Boolean, default=True)
     descripcion = Column(type_=types.Text)
-    usuarioId = Column(ForeignKey('usuario.id'), nullable=False, name='usuario_id', type_=types.UUID())
 
-    usuario = relationship('usuario', backref='notas')
+    usuarioId = Column(
+        ForeignKey('usuarios.id'),
+        nullable=False,
+        name='usuario_id',
+        type_=types.UUID()
+    )
+
+    usuario = relationship('Usuario', backref='notas')
