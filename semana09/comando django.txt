@@ -1,0 +1,13 @@
+django-admin startproject
+
+Django
+py manage.py runserver > Levanta el proyecto Django en modo de desarrollo
+
+py manage.py migrate > Ejecuta las migraciones faltantes en la base de datos
+
+py manage.py showmigration > muestra todas las migraciones que ya hay en el proyecto y las que estan en la bd [X]
+
+py manage.py startapp > Crea una aplicacion nueva dentro de la app
+
+py manage.py makemigrations --name NOMBRE_APP
+
