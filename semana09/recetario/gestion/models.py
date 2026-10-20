@@ -8,6 +8,11 @@ class Receta(models.Model):
     descripcion = models.TextField()
     habilitado = models.BooleanField(default=True)
 
+    def __str__(self):
+        #es un metodo de las clases de python que sirve para modificar la forma en la cual se representa la instancia
+        return self.titulo
+
+
     class Meta: #Siempre se llama meta por Metatributes
         db_table = 'recetas' #Nombre de la tabla
         ordering = ['titulo'] #Ordena de la A a la Z manera ascendente
@@ -34,6 +39,7 @@ class Ingredientes(models.Model):
 
     class Meta:
         db_table = 'ingredientes'
+        verbose_name_plural = 'Ingredientes'
 
 class Preparacion(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4)
@@ -50,4 +56,7 @@ class Preparacion(models.Model):
         #   2   |   1  Esto no deja el unique
 
         unique_together = [['order', 'recetaId']]
+
+        #Sirve para modificar el nombre pluralizado que se mostrara en el panel admin solo para ese panel de admin
+        verbose_name_plural = 'Preparaciones'
 
