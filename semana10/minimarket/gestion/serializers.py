@@ -1,0 +1,20 @@
+#ModelSerializer se vingula con el model y trae todas las configuraciones todas las validaciones
+from rest_framework.serializers import ModelSerializer
+from .models import Categoria
+
+#https://www.django-rest-framework.org/api-guide/serializers/#modelserializer
+class CategoriaSerializer(ModelSerializer):
+
+    class Meta:
+        model = Categoria
+        # Siempre debemos colocar uno de los siguientes atributos
+        #fields o exclude
+        #sirve para indicar al serializar que campos vamos a utilizar para hacer la validacioion
+        #fields = ["id", "nombre"]
+        
+        #Pero si se quiere todos los campos es:
+        fields = "__all__"
+        
+        #Todos los campos menos el nombre es:
+        #exclude = ["nombre"]
+
