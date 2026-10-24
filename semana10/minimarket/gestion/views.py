@@ -5,13 +5,32 @@ from rest_framework.request import Request
 from .models import Categoria
 from .serializers import CategoriaSerializer
 
+#Nos brinnda el proceso automatico para alguna operacion
+from rest_framework.generics import (CreateAPIView, #Para crear
+                                    DestroyAPIView, #Eliminar
+                                    ListAPIView, #devolver todo
+                                    ListCreateAPIView, #Devolver todos y creacion
+                                    RetrieveAPIView, #Devolver solo uno
+                                    RetrieveDestroyAPIView, #Devolver solo uno y ademas eliminar
+                                    RetrieveUpdateAPIView, #eliminar y ademas poder actualizar
+                                    RetrieveUpdateDestroyAPIView, # devolver solo uno y ademas poder actualizarlo o eliminarlo
+                                    UpdateAPIView #Actualizar
+
+
+)
+
 class CategoriasView(APIView):
     #Al usar el APIVIEW esto es muy similar al resourse de flask-restfult en el cual se puede colocar los
     #metodos http como metodos de la clase
     def get(self, request):
+
+        categorias = Categoria.objects.all()
+        #Si se pasa un conjunto de instancias se coloca many True para que el serializardor pueda iterar y transformar cada una de las instancias
+        dataSerializada = CategoriaSerializer(instance=categorias, many=True)
+
         #En django no se puede retornar un diccionario sino que tiene que crearse la instancia de la clase Response
         return Response(data = {
-            "content": ""
+            "content": dataSerializada.data
         })
 
     def post(self, request:Request):
@@ -36,3 +55,17 @@ class CategoriasView(APIView):
                 "message": "Error al crear la categoria",
                 "content": serializardor.errors
             }, status=status.HTTP_400_BAD_REQUEST)
+
+
+# GET | PUT | DELETE
+class DevolverActualizarEliminarCategoriaView(RetrieveUpdateDestroyAPIView):
+    
+    #Es la forma el cual la vista se comunicara con la bd
+    #Select * from categorias
+    queryset = Categoria.objects.all()
+
+    #Es la forma en la cual la vista se comunica con la data enviada por el cliente y la data enviada hacia el cliente
+    serializer_class = CategoriaSerializer
+
+    #lookup_field sirve para indicar el parametro que se usara para indicar la pk
+    lookup_field = 'id'
