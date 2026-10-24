@@ -1,6 +1,6 @@
 #ModelSerializer se vingula con el model y trae todas las configuraciones todas las validaciones
 from rest_framework.serializers import ModelSerializer
-from .models import Categoria
+from .models import Categoria, Producto
 
 #https://www.django-rest-framework.org/api-guide/serializers/#modelserializer
 class CategoriaSerializer(ModelSerializer):
@@ -13,8 +13,13 @@ class CategoriaSerializer(ModelSerializer):
         #fields = ["id", "nombre"]
         
         #Pero si se quiere todos los campos es:
-        fields = "__all__"
+        #fields = "__all__"
         
         #Todos los campos menos el nombre es:
-        #exclude = ["nombre"]
+        exclude = ["eliminado"] #No nos mostrara el campo eliminado
 
+
+class ProductoSerializer(ModelSerializer):
+    class Meta:
+        model = Producto
+        exclude = ["eliminado"]
