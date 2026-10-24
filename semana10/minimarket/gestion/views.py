@@ -144,6 +144,15 @@ class ProductosView(ViewSet):
     def create(self, request: Request):
         serializador = ProductoSerializer(data=request.data)
 
+        #Validar si la categoria enviada no ha sido eliminada, si esta eliminada entonces no proceder con la creacion del producto
+        categoriaEncontrada = Categoria.objects.filter(eliminado=False, id = request.data.get("categoria")).first()
+
+        if not categoriaEncontrada:
+            return Response(data={
+                "message": "Error al crear el producto",
+                "content": "Categoria no existe"
+            }, status=status.HTTP_404_NOT_FOUND)
+
         if serializador.is_valid():
             serializador.save()
 
