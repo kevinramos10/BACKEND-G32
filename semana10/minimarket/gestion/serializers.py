@@ -23,3 +23,11 @@ class ProductoSerializer(ModelSerializer):
     class Meta:
         model = Producto
         exclude = ["eliminado"]
+
+class ProductoDetalleSerializer(ModelSerializer):
+    class Meta:
+        model = Producto
+        exclude = ["eliminado"]
+        #Podemos acceder a la informacion que esta adyacente a este modelo es decir que si ponemos 1 ingresaremos 1 nivel si le 
+        #ponemos 2 ingresaremos 2 niveles (si hay)
+        depth = 1

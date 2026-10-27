@@ -18,7 +18,8 @@ from rest_framework.generics import (CreateAPIView, #Para crear
 from rest_framework.viewsets import ViewSet
 
 from .models import Categoria, Producto
-from .serializers import CategoriaSerializer, ProductoSerializer
+from .serializers import CategoriaSerializer, ProductoSerializer, ProductoDetalleSerializer
+from uuid import UUID
 
 class CategoriasView(APIView):
     #Al usar el APIVIEW esto es muy similar al resourse de flask-restfult en el cual se puede colocar los
@@ -138,8 +139,49 @@ class DevolverActualizarEliminarCategoriaView(RetrieveUpdateDestroyAPIView):
         return Response(data=None, status=status.HTTP_204_NO_CONTENT)
 
 class ProductosView(ViewSet):
-    def list(self, request):
-        pass
+    def list(self, request: Request):
+        #Al usar el get en un query.paramt solo retorna la 1era informacion del query parants solo toma el 1ero
+        #En cambio el getList obtiene todos los valores y los retorna en formato de lista para poder ser iterados
+
+        categoria = request.query_params.getlist('categoria')
+        nombre = request.query_params.get('nombre')
+
+        filtros = {
+            "eliminado": False
+        }
+            
+        if categoria:
+            filtros["categoria__in"] = [] #Para que sepa que estamos pasando una lista de categorias le ponemos el __in
+            for categoriaId in categoria:
+                #Validamos si el id de la categoria es un uuid valido, para evitar un error del lado de la bd
+                try:
+                    UUID(categoriaId)
+                except:
+                    return Response(data={
+                        "message": f"El id de la categoria {categoriaId} es invalido"
+                    })
+                categoriaEncontrada = Categoria.objects.filter(id = categoriaId, eliminado = False).first()
+                
+                if categoriaEncontrada:
+                    filtros["categoria__in"].append(str(categoriaEncontrada.id))        
+
+            #Validamos que si al final todas las categorias enviadas no existen no agregamos ese filtro a la variable
+            if len(filtros["categoria__in"]) == 0:
+                del filtros["categoria__in"] #eliminamos la clave categoria del diccionario
+
+        if nombre:
+            # icontains funciona igual que el ILIKE para que no importe las mayusculas e minisculas
+            filtros["nombre__icontains"] = nombre
+        print(filtros)
+        #al usar ** estamos indicando que las llaves se convertiran a parametros y sus valores se convertiran a valores de los parametros
+        #ejemplo:
+        #data={"nombre":"eduardo"} - **data - (nombre="eduardo") lo convierte
+        productos = Producto.objects.filter(**filtros).all()
+        serializador = ProductoSerializer(instance = productos, many=True)
+        return Response(data={
+            "content": serializador.data
+        })
+
 
     def create(self, request: Request):
         serializador = ProductoSerializer(data=request.data)
@@ -166,3 +208,34 @@ class ProductosView(ViewSet):
                 "message": "Error al crear la data",
                 "content": serializador.errors
             }, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ProductoView(ViewSet):
+    def retrieve(self, request:Request, id):
+
+        productoEncontrado = Producto.objects.filter(id = id, eliminado = False).first()
+
+        if not productoEncontrado:
+            return Response(data={
+                "message": "Producto no existe"
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        serializador = ProductoDetalleSerializer(instance = productoEncontrado)
+
+        return Response(data={
+            "content": serializador.data
+        })
+
+    def destroy(self, request:Request, id):
+        productoEncontrado = Producto.objects.filter(id = id, eliminado = False).first()
+        
+        if not productoEncontrado:
+            return Response(data={
+                "message": "Producto no existe"
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        #Hacemos el eliminado cambiando el estado a True y luego guardandolo en la bd
+        productoEncontrado.eliminado = True
+        productoEncontrado.save()
+
+        return Response(data=None, status=status.HTTP_204_NO_CONTENT)
