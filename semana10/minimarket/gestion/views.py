@@ -16,10 +16,17 @@ from rest_framework.generics import (CreateAPIView, #Para crear
                                     UpdateAPIView) #Actualizar
 
 from rest_framework.viewsets import ViewSet
+from rest_framework.decorators import api_view
 
 from .models import Categoria, Producto
-from .serializers import CategoriaSerializer, ProductoSerializer, ProductoDetalleSerializer
+from .serializers import CategoriaSerializer, ProductoSerializer, ProductoDetalleSerializer, GenerarUrlAWSSerializer
 from uuid import UUID
+
+#Para conectar con el aws generar 
+from boto3 import client
+from os import getenv
+from urllib.parse import unquote
+
 
 class CategoriasView(APIView):
     #Al usar el APIVIEW esto es muy similar al resourse de flask-restfult en el cual se puede colocar los
@@ -210,7 +217,9 @@ class ProductosView(ViewSet):
             }, status=status.HTTP_400_BAD_REQUEST)
 
 
+
 class ProductoView(ViewSet):
+
     def retrieve(self, request:Request, id):
 
         productoEncontrado = Producto.objects.filter(id = id, eliminado = False).first()
@@ -239,3 +248,33 @@ class ProductoView(ViewSet):
         productoEncontrado.save()
 
         return Response(data=None, status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(http_method_names=['POST'])
+def crearUrlParaSubirArchivo(request:Request):
+    serializador = GenerarUrlAWSSerializer(data=request.data)
+    if serializador.is_valid():
+        fileName = serializador.validated_data.get("fileName")
+        ext = serializador.validated_data.get("ext")
+        contentType = serializador.validated_data.get("contentType")
+        folder = serializador.validated_data.get("folder", "/")
+
+        s3 = client('s3')
+        url = s3.generate_presigned_url(
+            ClientMethod = 'put_object',
+            Params={
+                "Bucket":getenv('BUCKET_NAME'),
+                "Key": folder + fileName + ext,
+                "ContentType": contentType
+            },
+            ExpiresIn=150
+        )
+        return Response(data={
+            "content": unquote(url)
+        })
+    else:
+        return Response(data={
+            "message": "Error al generar la URL",
+            "content": serializador.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
+
