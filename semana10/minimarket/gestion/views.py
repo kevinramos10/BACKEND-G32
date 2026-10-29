@@ -19,8 +19,8 @@ from rest_framework.viewsets import ViewSet
 from rest_framework.decorators import api_view
 
 from .models import Categoria, Producto
-from .serializers import CategoriaSerializer, ProductoSerializer, ProductoDetalleSerializer, GenerarUrlAWSSerializer
-from uuid import UUID
+from .serializers import CategoriaSerializer, ProductoSerializer, ProductoDetalleSerializer, GenerarUrlAWSSerializer, MediaSerializer
+from uuid import UUID, uuid4
 
 #Para conectar con el aws generar 
 from boto3 import client
@@ -184,6 +184,23 @@ class ProductosView(ViewSet):
         #ejemplo:
         #data={"nombre":"eduardo"} - **data - (nombre="eduardo") lo convierte
         productos = Producto.objects.filter(**filtros).all()
+
+        for producto in productos:
+            print(producto.media)
+            if producto.media is None:
+                continue
+            key = producto.media.ruta + producto.media.nombre + '.' + producto.media.ext
+            s3 = client('s3')
+            url = s3.generate_presigned_url(
+                ClientMethod = 'get_object', #obtener
+                Params = {
+                    "Bucket": getenv('BUCKET_NAME'),
+                    "Key": key
+                },
+                ExpiresIn=30
+            )
+            print(url)
+            
         serializador = ProductoSerializer(instance = productos, many=True)
         return Response(data={
             "content": serializador.data
@@ -260,17 +277,25 @@ def crearUrlParaSubirArchivo(request:Request):
         folder = serializador.validated_data.get("folder", "/")
 
         s3 = client('s3')
+        nombre = str(uuid4()) + '_' + fileName 
+
         url = s3.generate_presigned_url(
             ClientMethod = 'put_object',
             Params={
                 "Bucket":getenv('BUCKET_NAME'),
-                "Key": folder + fileName + ext,
+                "Key": folder + nombre + '.' + ext ,
                 "ContentType": contentType
             },
             ExpiresIn=150
         )
         return Response(data={
-            "content": unquote(url)
+            "content": {
+                "url": unquote(url),
+                "nombre": nombre,
+                "ext": ext,
+                "mimeType": contentType,
+                "ruta": folder
+            }
         })
     else:
         return Response(data={
@@ -278,3 +303,23 @@ def crearUrlParaSubirArchivo(request:Request):
             "content": serializador.errors
         }, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(http_method_names=['POST'])
+def crearMedia(request:Request):
+    serializador = MediaSerializer(data = request.data)
+
+    if serializador.is_valid():
+        serializador.save()
+
+        return Response(data={
+            "message": "Archivo creado exitosamente",
+            "content": {
+                "id" : serializador.data.get("id")
+            } 
+        }, status=status.HTTP_201_CREATED)
+
+    else:
+        return Response(data={
+            "message": "Error al crear el archivo",
+            "content": serializador.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
