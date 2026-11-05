@@ -90,7 +90,39 @@ print(f'\nTotal de la planilla: {total_planilla}')
 
 
 class Producto:
-    def __init__(self, nombre, stock):
-        self.nombre - -nombre
-        
+    def __init__(self, nombre, precio, stock):
+        self.nombre = nombre
+        self.__precio = precio
+        self.stock = stock
+
+    @property
+    def precio(self):
+        return self.__precio
+
+    @precio.setter
+    def precio(self, nuevo_precio):
+        if nuevo_precio < 0:
+            return("El precio no puede ser negativo") 
+        self.__precio = nuevo_precio    
+
+        return self.__precio
+
+    def calcular_precio_final(self):
+        return self.__precio
+
+    def vender(self, cantidad):
+        if self.stock > cantidad:
+            self.stock -= cantidad
+
+        return("Error: El stock no es suficiente!")
+
+class ProductoConDescuento(Producto):
+    def __init__(self, nombre, precio, stock, porcentaje_descuento):
+        super().__init__(nombre, precio, stock)
+        self.porcentaje_descuento = porcentaje_descuento
+    
+    def calcular_precio_final(self):
+        self.precio -= 
+
+
 

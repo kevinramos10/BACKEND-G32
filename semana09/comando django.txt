@@ -9,5 +9,11 @@ py manage.py showmigration > muestra todas las migraciones que ya hay en el proy
 
 py manage.py startapp > Crea una aplicacion nueva dentro de la app
 
-py manage.py makemigrations --name NOMBRE_APP
+py manage.py makemigrations --name NOMBRE_APP > crea una migracion en la base a todos los cambios que hay en esa app
+
+py manage.py sqlmigrate NOMBRE_APP NUM_MIGRACION > muestra el script sql que se va a ejecutar en la base de datos a raiz de la migracion
+
+py manage.py createsuperuser > Para crear las credenciales desde el mismo tabla que nos crea.
+
+
 

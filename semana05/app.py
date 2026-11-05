@@ -26,7 +26,9 @@ conexion = connect(conninfo=credenciales)
 # Flask se utiliza el patrón de diseño de Singleton
 app = Flask(__name__)
 
-CORS(app, origins=['http://127.0.0.1:5500'], methods=['GET', 'POST', 'PUT', 'DELETE'])
+CORS(app, origins=['http://127.0.0.1:5500'], methods=['GET','POST','PUT','DELETE'])
+
+
 
 productos = [
     {

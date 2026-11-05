@@ -7,7 +7,7 @@ from .models import Ingredientes, Preparacion, Receta
 class IngredienteAdmin(admin.ModelAdmin):
     readonly_fields = ["id"] 
 
-    list_display = ["id", "descripcion", "cantidad", "recetaId"] #Para poder decile que columnas puevo ver
+    list_display = ["descripcion", "cantidad"] #Para poder decile que columnas puevo ver
 
     #Opciones de filtro en la barra lateral utilizando
 
@@ -16,10 +16,10 @@ class IngredienteAdmin(admin.ModelAdmin):
     search_fields = ["descripcion", "recetaId__titulo"]
 
     #editar
-    list_editable = ["recetaId"]
+    #list_editable = ["recetaId"]
 
     #Modifica el ordenamiento predeterminado o indicado en el modelo en el panel admin
-    ordering = ["descripcion"]
+    #ordering = ["descripcion"]
 
 
     pass
@@ -47,4 +47,4 @@ class RecetaAdmin(admin.ModelAdmin):
 
 @admin.register(Preparacion)
 class PreparacionAdmin(admin.ModelAdmin):
-    pass 
+    readonly_fields = ["id"] 

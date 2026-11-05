@@ -3,12 +3,14 @@ from flask_restful import Api
 from .config import config_map
 from .extensions import db, migrate
 from .models import *
-from .api import RegistroController, LoginController
+from .api import RegistroController, LoginController, UsuarioController, ResetPasswordController
+from flask_jwt_extended import JWTManager
 
 def create_app(env='development'):
     app = Flask(__name__)
     api = Api(app)
-
+    #Inicializamos la instanacia de JWT, para que pueda ser utilizada en todo e proyecto
+    JWTManager(app)
     app.config.from_object(config_map[env])
 
     db.init_app(app)
@@ -16,5 +18,7 @@ def create_app(env='development'):
 
     api.add_resource(RegistroController, '/registro')
     api.add_resource(LoginController, '/login')
+    api.add_resource(UsuarioController, '/usuario')
+    api.add_resource(ResetPasswordController, '/reset-password')
 
     return app

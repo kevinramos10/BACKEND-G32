@@ -2,8 +2,8 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.request import Request
-from .models import Categoria
-from .serializers import CategoriaSerializer
+from .models import Categoria, Precio
+from .serializers import CategoriaSerializer, PrecioSSerializer
 #Nos brinnda el proceso automatico para alguna operacion
 from rest_framework.generics import (CreateAPIView, #Para crear
                                     DestroyAPIView, #Eliminar
@@ -186,20 +186,22 @@ class ProductosView(ViewSet):
         productos = Producto.objects.filter(**filtros).all()
 
         for producto in productos:
+
             print(producto.media)
-            if producto.media is None:
-                continue
-            key = producto.media.ruta + producto.media.nombre + '.' + producto.media.ext
-            s3 = client('s3')
-            url = s3.generate_presigned_url(
-                ClientMethod = 'get_object', #obtener
-                Params = {
-                    "Bucket": getenv('BUCKET_NAME'),
-                    "Key": key
-                },
-                ExpiresIn=30
-            )
+            if producto.media:                
+                key = producto.media.ruta + producto.media.nombre + '.' + producto.media.ext
+                s3 = client('s3')
+                url = s3.generate_presigned_url(
+                    ClientMethod = 'get_object', #obtener
+                    Params = {
+                        "Bucket": getenv('BUCKET_NAME'),
+                        "Key": key
+                    },
+                    ExpiresIn=30
+                )
             print(url)
+            # Agrego a la instancia de producto un nuevo atributo llamado url que hara match con el atributo del serializador 
+            producto.url = url
             
         serializador = ProductoSerializer(instance = productos, many=True)
         return Response(data={
@@ -220,7 +222,22 @@ class ProductosView(ViewSet):
             }, status=status.HTTP_404_NOT_FOUND)
 
         if serializador.is_valid():
-            serializador.save()
+            
+
+            nuevoProducto = serializador.save()
+            media = serializador.validated_data.get('media')
+            if media:
+                key = media.ruta + media.nombre + '.' + media.ext
+                s3 = client('s3')
+                url = s3.generate_presigned_url(
+                    ClientMethod = 'get_object',
+                    Params = {
+                        "Bucket": getenv('BUCKET_NAME'),
+                        "Key":key
+                    },
+                    ExpiresIn=30
+                )
+                nuevoProducto.url = url
 
             return Response(data={
                 "message": "Producto creado exitosamente",
@@ -322,4 +339,31 @@ def crearMedia(request:Request):
             "message": "Error al crear el archivo",
             "content": serializador.errors
         }, status=status.HTTP_400_BAD_REQUEST)
-    
+
+
+class PreciosView(APIView):
+    def post(self, request:Request):
+        serializador = PrecioSSerializer(data = request.data)
+        precioDelProducto = Precio.objects.filter(Producto = serializador.data.get('producto')).first()
+
+        if serializador.is_valid:
+            habilitado = serializador.validated_data.get("habilitado", True)
+
+            if precioDelProducto.habilitado and habilitado:
+                precioDelProducto.habilitado = False
+                precioDelProducto.save()
+            serializador.save()
+
+            return Response(data={
+                "message": "Precio creado exitosamente",
+                "content": serializador.data
+            }, status=status.HTTP_201_CREATED)
+
+        else:
+            return Response(data={
+                "message": "Error al crear el precio",
+                "content": serializador.errors
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+    def get(self, request:Request):
+        pass
