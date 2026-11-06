@@ -134,3 +134,18 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 #PAra indicar que esta sera la nueva tabla para reemplazar al auth_user
 AUTH_USER_MODEL = 'gestion.Usuario'
+
+
+#Sirve para configurar opciones adicionales a librerias de django rest framework
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
+
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=3, minutes=30),
+    "SIGNING_KEY":getenv("JWT_SECRET"),
+}

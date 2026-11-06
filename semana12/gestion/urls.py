@@ -1,6 +1,11 @@
 from django.urls import path
-from .views import UsuariosView
+from .views import registroUsuario, perfilUsuario, loginManual
+from rest_framework_simplejwt.views import TokenObtainPairView
 
-urlspatterns = [
-    path('registro', UsuariosView.as_view())
+urlpatterns = [
+    path('registro', registroUsuario),
+    path('perfil', perfilUsuario),
+    path('login-libreria', TokenObtainPairView.as_view()),
+    path('login', loginManual),
 ]
+
